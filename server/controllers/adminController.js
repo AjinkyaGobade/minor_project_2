@@ -42,7 +42,7 @@ const getAllCertifications = async (req, res) => {
 
         const total = await Certification.countDocuments(query);
         const certifications = await Certification.find(query)
-            .populate('user', 'name email rollNo department')
+            .populate('user', 'name email rollNo employeeId department role')
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit);
@@ -61,6 +61,7 @@ const getAllCertifications = async (req, res) => {
 const getStats = async (req, res) => {
     try {
         const totalStudents = await User.countDocuments({ role: 'student' });
+        const totalFaculty = await User.countDocuments({ role: 'faculty' });
         const totalCertifications = await Certification.countDocuments();
         const verifiedCerts = await Certification.countDocuments({ status: 'Approved' });
         const pendingCerts = await Certification.countDocuments({ status: 'Pending' });
@@ -92,6 +93,7 @@ const getStats = async (req, res) => {
 
         res.json({
             totalStudents,
+            totalFaculty,
             totalCertifications,
             verifiedCerts,
             pendingCerts,
