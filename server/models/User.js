@@ -10,14 +10,17 @@ const userSchema = mongoose.Schema(
         department: { type: String },
         semester: { type: Number },
         employeeId: { type: String },
-        rollNo: { type: String },
+        rollNo: { type: String, unique: true, sparse: true },
+        profileImage: { type: String, default: 'https://via.placeholder.com/150' },
+        resetPasswordToken: String,
+        resetPasswordExpire: Date,
     },
     { timestamps: true }
 );
 
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function () {
     if (!this.isModified('password')) {
-        next();
+        return;
     }
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);

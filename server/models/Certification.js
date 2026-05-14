@@ -3,15 +3,21 @@ const mongoose = require('mongoose');
 const certificationSchema = mongoose.Schema(
     {
         user: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
+        uploadedBy: { type: String }, // To store user name directly for easy access
         title: { type: String, required: true },
-        issuingOrganization: { type: String, required: true },
-        issueDate: { type: Date, required: true },
-        expiryDate: { type: Date },
-        certificateId: { type: String },
+        description: { type: String },
+        category: { type: String },
         fileUrl: { type: String, required: true },
-        platform: { type: String }, 
-        status: { type: String, enum: ['pending', 'verified', 'rejected'], default: 'pending' },
+        status: { type: String, enum: ['Pending', 'Approved', 'Rejected'], default: 'Pending' },
+        adminFeedback: { type: String },
         verifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        ocrResult: {
+            processed: { type: Boolean, default: false },
+            isMatch: { type: Boolean },
+            confidence: { type: Number },
+            warnings: [{ type: String }],
+            rawText: { type: String }
+        }
     },
     { timestamps: true }
 );

@@ -2,6 +2,10 @@ const path = require('path');
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
 
 const authRoutes = require('./routes/authRoutes');
@@ -14,6 +18,17 @@ connectDB();
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Security Middleware
+app.use(helmet());
+app.use(mongoSanitize());
+app.use(xss());
+
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100 // limit each IP to 100 requests per windowMs
+});
+app.use('/api/', apiLimiter);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/certifications', certRoutes);

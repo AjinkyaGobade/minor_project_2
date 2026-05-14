@@ -18,7 +18,10 @@ const Navbar = () => {
                 <div className="flex justify-between h-16">
                     <div className="flex items-center">
                         <Award className="h-8 w-8 text-primary" />
-                        <span className="ml-2 text-xl font-bold text-gray-900">CertTracker</span>
+                        <div className="ml-3 flex flex-col">
+                            <span className="text-xl font-bold text-gray-900 leading-tight">SDMCET CertTracker</span>
+                            <span className="text-xs text-gray-500 font-medium">SDM College of Engineering & Technology, Dharwad</span>
+                        </div>
                     </div>
                     {user && (
                         <div className="flex items-center space-x-4">
