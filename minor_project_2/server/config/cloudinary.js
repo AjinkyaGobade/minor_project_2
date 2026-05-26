@@ -10,7 +10,7 @@ cloudinary.config({
 
 // multer-storage-cloudinary v2 uses 'params' key
 const storage = CloudinaryStorage({
-    cloudinary: cloudinary,
+    cloudinary: require('cloudinary'),
     params: {
         folder: 'sdmcet_certificates',
         allowed_formats: ['jpg', 'png', 'jpeg', 'pdf'],
