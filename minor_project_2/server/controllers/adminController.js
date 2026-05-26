@@ -25,7 +25,7 @@ const getAllCertifications = async (req, res) => {
         if (req.user.role === 'faculty') {
             const studentsInDept = await User.find({ department: req.user.department }).select('_id');
             studentIds = studentsInDept.map(s => s._id);
-            query = { user: { $in: studentIds } };
+            query.user = { $in: studentIds };
         }
 
         // Search logic
