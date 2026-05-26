@@ -49,9 +49,14 @@ const addCertification = async (req, res) => {
             return res.status(400).json({ message: 'No file uploaded' });
         }
 
-        const fileUrl = req.file.path.startsWith('http') 
-            ? req.file.path 
-            : `/${req.file.path.replace(/\\/g, '/')}`;
+        const filePath = req.file.path || req.file.secure_url || req.file.url;
+        if (!filePath) {
+            return res.status(400).json({ message: 'File uploaded but path could not be resolved' });
+        }
+
+        const fileUrl = filePath.startsWith('http') 
+            ? filePath 
+            : `/${filePath.replace(/\\/g, '/')}`;
 
         const certification = new Certification({
             user: req.user._id,
@@ -81,8 +86,7 @@ const addCertification = async (req, res) => {
         // Trigger OCR asynchronously if it's an image
         if (req.file.mimetype.startsWith('image/')) {
             // Use the absolute URL if Cloudinary, or local path if local storage
-            const filePathForOCR = req.file.path.startsWith('http') ? req.file.path : req.file.path;
-            processOCR(createdCertification._id, filePathForOCR, category || '', req.user.name);
+            processOCR(createdCertification._id, filePath, category || '', req.user.name);
         }
 
         res.status(201).json(createdCertification);
