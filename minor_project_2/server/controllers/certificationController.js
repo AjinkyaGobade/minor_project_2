@@ -49,14 +49,19 @@ const addCertification = async (req, res) => {
             return res.status(400).json({ message: 'No file uploaded' });
         }
 
-        const filePath = req.file.path || req.file.secure_url || req.file.url;
+        const filePath = req.file.secure_url || req.file.path || req.file.url;
         if (!filePath) {
             return res.status(400).json({ message: 'File uploaded but path could not be resolved' });
         }
 
-        const fileUrl = filePath.startsWith('http') 
+        let fileUrl = filePath.startsWith('http') 
             ? filePath 
             : `/${filePath.replace(/\\/g, '/')}`;
+
+        // Force HTTPS for external URLs to prevent Mixed Content blocking in modern browsers
+        if (fileUrl.startsWith('http://')) {
+            fileUrl = fileUrl.replace('http://', 'https://');
+        }
 
         const certification = new Certification({
             user: req.user._id,
