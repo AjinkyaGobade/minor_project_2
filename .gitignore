@@ -1,0 +1,21 @@
+# Dependencies
+**/node_modules/
+
+# Production build output
+**/dist/
+**/dist-ssr/
+
+# Environment configurations
+**/.env
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+
+# Operating System specific files
+**/.DS_Store
+**/Thumbs.db
+
+# Server upload folder files
+**/minor_project_2/server/uploads/*
+!**/minor_project_2/server/uploads/.gitkeep
