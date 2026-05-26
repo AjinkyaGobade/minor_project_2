@@ -8,9 +8,14 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET || ''
 });
 
-// multer-storage-cloudinary v2 uses 'params' key
+// Support both multer-storage-cloudinary v2 (flat properties) and v3/v4 (nested in params)
 const storage = CloudinaryStorage({
     cloudinary: require('cloudinary'),
+    // v2 flat configuration
+    folder: 'sdmcet_certificates',
+    allowedFormats: ['jpg', 'png', 'jpeg', 'pdf'],
+    resourceType: 'auto',
+    // v3/v4 nested configuration
     params: {
         folder: 'sdmcet_certificates',
         allowed_formats: ['jpg', 'png', 'jpeg', 'pdf'],
