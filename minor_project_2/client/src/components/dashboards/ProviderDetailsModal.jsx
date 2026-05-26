@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { X, Shield, AlertTriangle, Check, Download, Filter } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { getFullFileUrl } from '../../utils/urlHelper';
 
 const ProviderDetailsModal = ({ provider, year, onClose, onCertClick }) => {
     const [certifications, setCertifications] = useState([]);
@@ -123,7 +124,7 @@ const ProviderDetailsModal = ({ provider, year, onClose, onCertClick }) => {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex space-x-2">
                                                 <button onClick={() => onCertClick(cert)} className="px-3 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg text-xs font-bold transition">View</button>
-                                                <a href={cert.fileUrl} target="_blank" rel="noreferrer" className="px-3 py-1.5 bg-gray-50 text-gray-600 hover:bg-gray-200 rounded-lg text-xs font-bold flex items-center transition"><Download className="w-3 h-3 mr-1" /> DL</a>
+                                                <a href={getFullFileUrl(cert.fileUrl)} target="_blank" rel="noreferrer" className="px-3 py-1.5 bg-gray-50 text-gray-600 hover:bg-gray-200 rounded-lg text-xs font-bold flex items-center transition"><Download className="w-3 h-3 mr-1" /> DL</a>
                                                 {cert.status?.toLowerCase() === 'pending' && (
                                                     <>
                                                         <button onClick={() => handleVerify(cert._id, 'Approved')} className="p-1.5 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition" title="Approve"><Check className="w-4 h-4" /></button>

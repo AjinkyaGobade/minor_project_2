@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, ExternalLink, Download, Check, XCircle, ZoomIn, ZoomOut, Maximize2, AlertTriangle, FileText, FileBadge } from 'lucide-react';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import { getFullFileUrl } from '../../utils/urlHelper';
 
 const CertificateViewerModal = ({ cert, onClose, onUpdateStatus }) => {
     const [zoom, setZoom] = useState(100);
@@ -10,6 +11,7 @@ const CertificateViewerModal = ({ cert, onClose, onUpdateStatus }) => {
     if (!cert) return null;
 
     const fileUrlStr = cert.fileUrl || '';
+    const resolvedFileUrl = getFullFileUrl(fileUrlStr);
     const cleanUrl = fileUrlStr.split('?')[0];
     const isPDF = cleanUrl.match(/\.(pdf)$/i) != null;
     const isImage = cleanUrl.match(/\.(jpeg|jpg|gif|png|webp|svg)$/i) != null || (!isPDF && fileUrlStr.includes('image/upload'));
@@ -60,10 +62,10 @@ const CertificateViewerModal = ({ cert, onClose, onUpdateStatus }) => {
                             <button onClick={() => setZoom(z => Math.min(z + 25, 200))} className="p-1.5 text-gray-600 hover:text-indigo-600 hover:bg-white rounded shadow-sm transition"><ZoomIn className="w-4 h-4" /></button>
                             <button onClick={() => setZoom(100)} className="p-1.5 text-gray-600 hover:text-indigo-600 hover:bg-white rounded shadow-sm transition" title="Reset Zoom"><Maximize2 className="w-4 h-4" /></button>
                         </div>
-                        <a href={cert.fileUrl} target="_blank" rel="noreferrer" className="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition flex items-center gap-1 text-sm font-bold" title="Open in new tab">
+                        <a href={resolvedFileUrl} target="_blank" rel="noreferrer" className="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition flex items-center gap-1 text-sm font-bold" title="Open in new tab">
                             <ExternalLink className="w-5 h-5" />
                         </a>
-                        <a href={cert.fileUrl} download className="p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition flex items-center gap-1 text-sm font-bold" title="Download">
+                        <a href={resolvedFileUrl} download className="p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition flex items-center gap-1 text-sm font-bold" title="Download">
                             <Download className="w-5 h-5" />
                         </a>
                         <div className="h-6 w-px bg-gray-300 mx-1"></div>
@@ -81,7 +83,7 @@ const CertificateViewerModal = ({ cert, onClose, onUpdateStatus }) => {
                             className="bg-white shadow-xl transition-all duration-300 ease-in-out relative"
                             style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'center center', width: isPDF ? '100%' : 'auto', height: isPDF ? '100%' : 'auto' }}
                         >
-                            {!cert.fileUrl ? (
+                            {!resolvedFileUrl ? (
                                 <div className="p-12 text-center flex flex-col items-center justify-center h-full">
                                     <FileText className="w-16 h-16 text-gray-300 mb-4" />
                                     <h4 className="text-xl font-bold text-gray-500">Certificate Unavailable</h4>
@@ -89,13 +91,13 @@ const CertificateViewerModal = ({ cert, onClose, onUpdateStatus }) => {
                                 </div>
                             ) : isPDF ? (
                                 <iframe 
-                                    src={`${cert.fileUrl}#toolbar=0&view=FitH`} 
+                                    src={`${resolvedFileUrl}#toolbar=0&view=FitH`} 
                                     className="w-full h-[70vh] lg:h-full min-h-[600px] border-0"
                                     title="PDF Certificate"
                                 />
                             ) : isImage ? (
                                 <img 
-                                    src={cert.fileUrl} 
+                                    src={resolvedFileUrl} 
                                     alt="Certificate Preview" 
                                     className="max-w-full h-auto object-contain"
                                     onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/800x600/f3f4f6/9ca3af?text=Image+Load+Error'; }}
@@ -105,7 +107,7 @@ const CertificateViewerModal = ({ cert, onClose, onUpdateStatus }) => {
                                     <FileText className="w-16 h-16 text-gray-300 mb-4" />
                                     <h4 className="text-xl font-bold text-gray-500">Preview not supported</h4>
                                     <p className="text-gray-400 mt-2">Please open in new tab or download to view this file type.</p>
-                                    <a href={cert.fileUrl} target="_blank" rel="noreferrer" className="mt-6 px-6 py-2 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition">Open File</a>
+                                    <a href={resolvedFileUrl} target="_blank" rel="noreferrer" className="mt-6 px-6 py-2 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition">Open File</a>
                                 </div>
                             )}
                         </div>

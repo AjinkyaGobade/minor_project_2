@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Award, CheckCircle, Calendar, Building, BookOpen } from 'lucide-react';
+import { getFullFileUrl } from '../utils/urlHelper';
 
 const Portfolio = () => {
     const { rollNo } = useParams();
@@ -84,7 +85,7 @@ const Portfolio = () => {
                                         <span className="text-xs font-semibold text-green-600 uppercase tracking-wider flex items-center">
                                             <CheckCircle className="w-4 h-4 mr-1" /> Verified
                                         </span>
-                                        <a href={cert.fileUrl} target="_blank" rel="noreferrer" className="text-sm font-medium text-primary hover:underline">
+                                        <a href={getFullFileUrl(cert.fileUrl)} target="_blank" rel="noreferrer" className="text-sm font-medium text-primary hover:underline">
                                             View Certificate &rarr;
                                         </a>
                                     </div>
