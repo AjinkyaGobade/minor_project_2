@@ -22,7 +22,8 @@ app.use(express.json());
 // Security Middleware
 app.use(helmet({
     crossOriginResourcePolicy: false,
-    contentSecurityPolicy: false
+    contentSecurityPolicy: false,
+    frameguard: false
 }));
 app.use(mongoSanitize());
 app.use(xss());
