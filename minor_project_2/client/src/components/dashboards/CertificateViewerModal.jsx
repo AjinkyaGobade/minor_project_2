@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { X, ExternalLink, Download, Check, XCircle, ZoomIn, ZoomOut, Maximize2, AlertTriangle, FileText, FileBadge } from 'lucide-react';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { getFullFileUrl } from '../../utils/urlHelper';
+import { AuthContext } from '../../context/AuthContext';
 
 const CertificateViewerModal = ({ cert, onClose, onUpdateStatus }) => {
+    const { user: currentUser } = useContext(AuthContext);
     const [zoom, setZoom] = useState(100);
     const [isUpdating, setIsUpdating] = useState(false);
+    
+    const canVerify = currentUser && (currentUser.role === 'admin' || currentUser.role === 'faculty');
 
     if (!cert) return null;
 
@@ -177,25 +181,27 @@ const CertificateViewerModal = ({ cert, onClose, onUpdateStatus }) => {
                         </div>
 
                         {/* Admin Action Bar */}
-                        <div className="p-6 border-t border-gray-100 bg-gray-50">
-                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 text-center">Verification Actions</p>
-                            <div className="grid grid-cols-2 gap-3">
-                                <button 
-                                    disabled={isUpdating || cert.status === 'Approved'}
-                                    onClick={() => handleVerify('Approved')} 
-                                    className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold transition-all ${cert.status === 'Approved' ? 'bg-emerald-50 text-emerald-400 cursor-not-allowed' : 'bg-emerald-600 text-white hover:bg-emerald-700 hover:shadow-lg'}`}
-                                >
-                                    <Check className="w-5 h-5" /> Approve
-                                </button>
-                                <button 
-                                    disabled={isUpdating || cert.status === 'Rejected'}
-                                    onClick={() => handleVerify('Rejected')} 
-                                    className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold transition-all ${cert.status === 'Rejected' ? 'bg-rose-50 text-rose-400 cursor-not-allowed' : 'bg-rose-600 text-white hover:bg-rose-700 hover:shadow-lg'}`}
-                                >
-                                    <XCircle className="w-5 h-5" /> Reject
-                                </button>
+                        {canVerify && (
+                            <div className="p-6 border-t border-gray-100 bg-gray-50">
+                                <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 text-center">Verification Actions</p>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <button 
+                                        disabled={isUpdating || cert.status === 'Approved'}
+                                        onClick={() => handleVerify('Approved')} 
+                                        className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold transition-all ${cert.status === 'Approved' ? 'bg-emerald-50 text-emerald-400 cursor-not-allowed' : 'bg-emerald-600 text-white hover:bg-emerald-700 hover:shadow-lg'}`}
+                                    >
+                                        <Check className="w-5 h-5" /> Approve
+                                    </button>
+                                    <button 
+                                        disabled={isUpdating || cert.status === 'Rejected'}
+                                        onClick={() => handleVerify('Rejected')} 
+                                        className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold transition-all ${cert.status === 'Rejected' ? 'bg-rose-50 text-rose-400 cursor-not-allowed' : 'bg-rose-600 text-white hover:bg-rose-700 hover:shadow-lg'}`}
+                                    >
+                                        <XCircle className="w-5 h-5" /> Reject
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 </div>
             </div>
