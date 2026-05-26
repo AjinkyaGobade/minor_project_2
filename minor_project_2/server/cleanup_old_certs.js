@@ -1,5 +1,9 @@
 const mongoose = require('mongoose');
+const dns = require('dns');
 require('dotenv').config();
+
+// Override DNS server to bypass local network / ISP blocks
+dns.setServers(['8.8.8.8']);
 
 const cleanup = async () => {
     try {
