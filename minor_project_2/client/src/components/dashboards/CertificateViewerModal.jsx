@@ -16,6 +16,10 @@ const CertificateViewerModal = ({ cert, onClose, onUpdateStatus }) => {
     const isPDF = cleanUrl.match(/\.(pdf)$/i) != null;
     const isImage = cleanUrl.match(/\.(jpeg|jpg|gif|png|webp|svg)$/i) != null || (!isPDF && fileUrlStr.includes('image/upload'));
 
+    // Cloudinary PDF dynamic image conversion to prevent browser security blocks
+    const isCloudinaryPDF = resolvedFileUrl.includes('res.cloudinary.com') && isPDF;
+    const previewUrl = isCloudinaryPDF ? resolvedFileUrl.replace(/\.pdf$/i, '.jpg') : resolvedFileUrl;
+
     const handleVerify = async (status) => {
         setIsUpdating(true);
         try {
@@ -90,11 +94,20 @@ const CertificateViewerModal = ({ cert, onClose, onUpdateStatus }) => {
                                     <p className="text-gray-400 mt-2">The file URL is missing or corrupted.</p>
                                 </div>
                             ) : isPDF ? (
-                                <iframe 
-                                    src={`${resolvedFileUrl}#toolbar=0&view=FitH`} 
-                                    className="w-full h-[70vh] lg:h-full min-h-[600px] border-0"
-                                    title="PDF Certificate"
-                                />
+                                isCloudinaryPDF ? (
+                                    <img 
+                                        src={previewUrl} 
+                                        alt="Certificate Preview" 
+                                        className="max-w-full h-auto object-contain"
+                                        onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/800x600/f3f4f6/9ca3af?text=Image+Load+Error'; }}
+                                    />
+                                ) : (
+                                    <iframe 
+                                        src={`${resolvedFileUrl}#toolbar=0&view=FitH`} 
+                                        className="w-full h-[70vh] lg:h-full min-h-[600px] border-0"
+                                        title="PDF Certificate"
+                                    />
+                                )
                             ) : isImage ? (
                                 <img 
                                     src={resolvedFileUrl} 
