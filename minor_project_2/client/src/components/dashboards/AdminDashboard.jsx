@@ -30,12 +30,12 @@ const AdminDashboard = () => {
 
     useEffect(() => {
         fetchData();
-    }, [page, searchQuery, globalYearFilter]);
+    }, [page, searchQuery, globalYearFilter, departmentFilter, roleFilter, statusFilter]);
 
     const fetchData = async () => {
         try {
             const [certsRes, statsRes] = await Promise.all([
-                axios.get(`/api/admin/certifications?page=${page}&limit=20&search=${searchQuery}&year=${globalYearFilter}`),
+                axios.get(`/api/admin/certifications?page=${page}&limit=20&search=${searchQuery}&year=${globalYearFilter}&department=${departmentFilter}&role=${roleFilter}&status=${statusFilter}`),
                 axios.get(`/api/admin/stats?year=${globalYearFilter}`)
             ]);
             setCertifications(certsRes.data.data);
@@ -144,14 +144,9 @@ const AdminDashboard = () => {
         { name: 'Rejected', value: rejectedCerts > 0 ? rejectedCerts : 0 }
     ] : [];
 
-    const filteredCertifications = certifications.filter(cert => {
-        const matchDept = departmentFilter === 'All' || cert.user?.department === departmentFilter;
-        const matchStatus = statusFilter === 'All' || cert.status?.toLowerCase() === statusFilter.toLowerCase();
-        const matchRole = roleFilter === 'All' || cert.user?.role?.toLowerCase() === roleFilter.toLowerCase();
-        return matchDept && matchStatus && matchRole;
-    });
+    const filteredCertifications = certifications;
 
-    const uniqueDepartments = ['All', ...new Set(certifications.map(c => c.user?.department).filter(Boolean))];
+    const uniqueDepartments = ['All', 'CSE', 'ISE', 'ECE', 'EEE', 'ME', 'CV', 'AIML'];
 
     return (
         <div className="space-y-8">
@@ -163,7 +158,7 @@ const AdminDashboard = () => {
                         <select 
                             className="bg-transparent border-none focus:ring-0 text-sm font-semibold text-gray-700 p-2 cursor-pointer border-r border-gray-300 pr-4"
                             value={departmentFilter}
-                            onChange={(e) => setDepartmentFilter(e.target.value)}
+                            onChange={(e) => { setDepartmentFilter(e.target.value); setPage(1); }}
                         >
                             {uniqueDepartments.map(dept => (
                                 <option key={dept} value={dept}>{dept === 'All' ? 'All Departments' : dept}</option>
@@ -172,7 +167,7 @@ const AdminDashboard = () => {
                         <select 
                             className="bg-transparent border-none focus:ring-0 text-sm font-semibold text-gray-700 p-2 cursor-pointer border-r border-gray-300 pr-4"
                             value={roleFilter}
-                            onChange={(e) => setRoleFilter(e.target.value)}
+                            onChange={(e) => { setRoleFilter(e.target.value); setPage(1); }}
                         >
                             <option value="All">All Roles</option>
                             <option value="student">Students</option>
@@ -181,7 +176,7 @@ const AdminDashboard = () => {
                         <select 
                             className="bg-transparent border-none focus:ring-0 text-sm font-semibold text-gray-700 p-2 cursor-pointer"
                             value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
+                            onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
                         >
                             <option value="All">All Statuses</option>
                             <option value="Pending">Pending</option>
@@ -192,7 +187,7 @@ const AdminDashboard = () => {
                     <select
                         className="bg-indigo-50 border border-indigo-200 text-indigo-700 font-bold rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400 cursor-pointer shadow-sm transition"
                         value={globalYearFilter}
-                        onChange={(e) => setGlobalYearFilter(e.target.value)}
+                        onChange={(e) => { setGlobalYearFilter(e.target.value); setPage(1); }}
                     >
                         <option value="All">All Years</option>
                         {[...Array(5)].map((_, i) => {

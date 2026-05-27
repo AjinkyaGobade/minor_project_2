@@ -10,6 +10,9 @@ const getAllCertifications = async (req, res) => {
 
         const year = req.query.year;
         const provider = req.query.provider;
+        const status = req.query.status;
+        const department = req.query.department;
+        const role = req.query.role;
 
         let query = {};
         
@@ -19,34 +22,36 @@ const getAllCertifications = async (req, res) => {
         if (provider && provider !== 'All') {
             query.provider = provider;
         }
-        
-        // If it's a faculty, restrict to their department
-        let studentIds = null;
-        if (req.user.role === 'faculty') {
-            const studentsInDept = await User.find({ department: req.user.department }).select('_id');
-            studentIds = studentsInDept.map(s => s._id);
-            query.user = { $in: studentIds };
+        if (status && status !== 'All') {
+            query.status = status;
         }
 
-        // Search logic
+        // Build User level filters
+        let userMatchQuery = {};
+
+        // Faculty department restriction or user selected department filter
+        if (req.user.role === 'faculty') {
+            userMatchQuery.department = req.user.department;
+        } else if (department && department !== 'All') {
+            userMatchQuery.department = { $regex: `^${department}$`, $options: 'i' };
+        }
+
+        if (role && role !== 'All') {
+            userMatchQuery.role = role;
+        }
+
         if (search) {
-            // Find users matching the search term (name or rollNo)
-            let userMatchQuery = {
-                $or: [
-                    { name: { $regex: search, $options: 'i' } },
-                    { rollNo: { $regex: search, $options: 'i' } }
-                ]
-            };
-            
-            // Keep faculty restrictions if applicable
-            if (studentIds) {
-                userMatchQuery._id = { $in: studentIds };
-            }
-            
+            userMatchQuery.$or = [
+                { name: { $regex: search, $options: 'i' } },
+                { rollNo: { $regex: search, $options: 'i' } }
+            ];
+        }
+
+        const hasUserFilters = (req.user.role === 'faculty') || (department && department !== 'All') || (role && role !== 'All') || search;
+
+        if (hasUserFilters) {
             const matchingUsers = await User.find(userMatchQuery).select('_id');
             const matchingUserIds = matchingUsers.map(u => u._id);
-            
-            // Overwrite query to match these specific users
             query.user = { $in: matchingUserIds };
         }
 
