@@ -146,7 +146,7 @@ const AdminDashboard = () => {
 
     const filteredCertifications = certifications;
 
-    const uniqueDepartments = ['All', 'CSE', 'ISE', 'ECE', 'EEE', 'ME', 'CV', 'AIML'];
+    const uniqueDepartments = ['All', 'CSE', 'ISE', 'ECE', 'EEE', 'MECH', 'CIVIL', 'AIML'];
 
     return (
         <div className="space-y-8">

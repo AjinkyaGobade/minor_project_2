@@ -33,7 +33,13 @@ const getAllCertifications = async (req, res) => {
         if (req.user.role === 'faculty') {
             userMatchQuery.department = req.user.department;
         } else if (department && department !== 'All') {
-            userMatchQuery.department = { $regex: `^${department}$`, $options: 'i' };
+            if (department === 'MECH' || department === 'ME') {
+                userMatchQuery.department = { $in: ['MECH', 'ME'] };
+            } else if (department === 'CIVIL' || department === 'CV') {
+                userMatchQuery.department = { $in: ['CIVIL', 'CV'] };
+            } else {
+                userMatchQuery.department = { $regex: `^${department}$`, $options: 'i' };
+            }
         }
 
         if (role && role !== 'All') {
@@ -114,12 +120,42 @@ const getStats = async (req, res) => {
             }
         ]);
 
-        const departmentStats = deptAggregation.map(d => ({
-            name: d._id || 'General',
-            Total: d.total || 0,
-            Verified: d.verified || 0,
-            Pending: d.pending || 0,
-            Rejected: d.rejected || 0
+        const allDepts = {
+            'CSE': { Verified: 0, Pending: 0, Rejected: 0, Total: 0 },
+            'ISE': { Verified: 0, Pending: 0, Rejected: 0, Total: 0 },
+            'ECE': { Verified: 0, Pending: 0, Rejected: 0, Total: 0 },
+            'MECH': { Verified: 0, Pending: 0, Rejected: 0, Total: 0 },
+            'CIVIL': { Verified: 0, Pending: 0, Rejected: 0, Total: 0 },
+            'EEE': { Verified: 0, Pending: 0, Rejected: 0, Total: 0 },
+            'AIML': { Verified: 0, Pending: 0, Rejected: 0, Total: 0 }
+        };
+
+        deptAggregation.forEach(d => {
+            let deptName = String(d._id || 'GENERAL').toUpperCase().trim();
+            if (deptName === 'ME') deptName = 'MECH';
+            if (deptName === 'CV') deptName = 'CIVIL';
+            
+            if (allDepts[deptName]) {
+                allDepts[deptName].Total += d.total || 0;
+                allDepts[deptName].Verified += d.verified || 0;
+                allDepts[deptName].Pending += d.pending || 0;
+                allDepts[deptName].Rejected += d.rejected || 0;
+            } else {
+                allDepts[deptName] = {
+                    Total: d.total || 0,
+                    Verified: d.verified || 0,
+                    Pending: d.pending || 0,
+                    Rejected: d.rejected || 0
+                };
+            }
+        });
+
+        const departmentStats = Object.keys(allDepts).map(key => ({
+            name: key,
+            Total: allDepts[key].Total,
+            Verified: allDepts[key].Verified,
+            Pending: allDepts[key].Pending,
+            Rejected: allDepts[key].Rejected
         }));
 
         // Provider Breakdown
