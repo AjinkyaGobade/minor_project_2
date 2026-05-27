@@ -256,6 +256,7 @@ const AdminDashboard = () => {
                             <table className="min-w-full divide-y divide-gray-200/50">
                                 <thead className="bg-white/50 backdrop-blur-sm">
                                     <tr>
+                                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-16">Sl. No.</th>
                                         <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">User Info</th>
                                         <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Certificate Info</th>
                                         <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
@@ -263,8 +264,11 @@ const AdminDashboard = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200/50">
-                                    {filteredCertifications.map(cert => (
+                                    {filteredCertifications.map((cert, index) => (
                                         <tr key={cert._id} className="hover:bg-white/60 transition-colors duration-200">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-500">
+                                                {(page - 1) * 20 + index + 1}
+                                            </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="font-bold text-gray-900">{cert.user?.name}</div>
                                                 <div className="text-xs font-medium text-gray-500">
