@@ -159,7 +159,8 @@ const AdminAnalytics = ({ stats, onProviderClick }) => {
                                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fontWeight: 600, fill: '#4b5563'}} />
                                     <YAxis axisLine={false} tickLine={false} tick={{fill: '#4b5563'}} />
                                     <Tooltip cursor={{fill: '#f3f4f6'}} contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
-                                    <Bar dataKey="Verified" fill="#f59e0b" radius={[6, 6, 0, 0]} />
+                                    <Bar dataKey="Verified" fill="#10B981" radius={[6, 6, 0, 0]} name="Approved" />
+                                    <Bar dataKey="Pending" fill="#F59E0B" radius={[6, 6, 0, 0]} name="Pending" />
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>

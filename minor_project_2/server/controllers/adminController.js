@@ -86,9 +86,9 @@ const getStats = async (req, res) => {
         const baseMatch = yearQuery ? [{ $match: { year: yearQuery } }] : [];
         const baseApprovedMatch = yearQuery ? { year: yearQuery, status: 'Approved' } : { status: 'Approved' };
 
-        // Department Breakdown
+        // Department Breakdown (Total, Approved, Pending, Rejected)
         const deptAggregation = await Certification.aggregate([
-            { $match: baseApprovedMatch },
+            ...baseMatch,
             {
                 $lookup: {
                     from: 'users',
@@ -100,15 +100,21 @@ const getStats = async (req, res) => {
             { $unwind: '$student' },
             {
                 $group: {
-                    _id: '$student.department',
-                    count: { $sum: 1 }
+                    _id: { $toUpper: { $ifNull: ['$student.department', 'General'] } },
+                    total: { $sum: 1 },
+                    verified: { $sum: { $cond: [{ $eq: ['$status', 'Approved'] }, 1, 0] } },
+                    pending: { $sum: { $cond: [{ $eq: ['$status', 'Pending'] }, 1, 0] } },
+                    rejected: { $sum: { $cond: [{ $eq: ['$status', 'Rejected'] }, 1, 0] } }
                 }
             }
         ]);
 
         const departmentStats = deptAggregation.map(d => ({
-            name: d._id && typeof d._id === 'string' ? d._id : 'General',
-            Verified: d.count || 0
+            name: d._id || 'General',
+            Total: d.total || 0,
+            Verified: d.verified || 0,
+            Pending: d.pending || 0,
+            Rejected: d.rejected || 0
         }));
 
         // Provider Breakdown
@@ -135,16 +141,24 @@ const getStats = async (req, res) => {
             approved: y.approved || 0
         }));
 
-        // Month Breakdown
+        // Month Breakdown (Sorted Chronologically)
         const monthMatchQuery = yearQuery ? { year: yearQuery } : {};
         const monthAggregation = await Certification.aggregate([
             { $match: monthMatchQuery },
             { $group: { _id: '$month', count: { $sum: 1 } } }
         ]);
-        const monthStats = monthAggregation.map(m => ({
+        const monthStatsRaw = monthAggregation.map(m => ({
             month: m._id || 'Unknown',
             count: m.count || 0
         }));
+        
+        const monthOrder = {
+            'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6,
+            'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12
+        };
+        const monthStats = monthStatsRaw.sort((a, b) => {
+            return (monthOrder[a.month] || 0) - (monthOrder[b.month] || 0);
+        });
 
         // Category Breakdown
         const categoryAggregation = await Certification.aggregate([

@@ -358,7 +358,7 @@ const AdminDashboard = () => {
                     </div>
                     {stats && stats.departmentStats && (
                         <div className="glass-card p-6">
-                            <h2 className="text-xl font-bold mb-6 text-gray-800">Top Departments (Approved)</h2>
+                            <h2 className="text-xl font-bold mb-6 text-gray-800">Department Overview</h2>
                             <div className="h-48">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart data={stats.departmentStats}>
@@ -366,7 +366,8 @@ const AdminDashboard = () => {
                                         <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fontWeight: 600, fill: '#6b7280'}} />
                                         <YAxis axisLine={false} tickLine={false} tick={{fill: '#6b7280'}} />
                                         <RechartsTooltip cursor={{fill: '#f3f4f6'}} contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
-                                        <Bar dataKey="Verified" fill="#6366f1" radius={[6, 6, 0, 0]} />
+                                        <Bar dataKey="Verified" fill="#6366f1" radius={[6, 6, 0, 0]} name="Approved" />
+                                        <Bar dataKey="Pending" fill="#f59e0b" radius={[6, 6, 0, 0]} name="Pending" />
                                     </BarChart>
                                 </ResponsiveContainer>
                             </div>
